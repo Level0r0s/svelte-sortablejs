@@ -4,11 +4,14 @@
 TODO: Refactor all of this
 
 */
-  import Sortable from "./index.svelte";
+
+  import { onMount } from "svelte";
   import { flip } from "svelte/animate";
   import { crossfade } from "svelte/transition";
 
   import Logo from "./logo.svelte";
+
+  import Sortable from "./index.svelte";
 
   let value = "";
 

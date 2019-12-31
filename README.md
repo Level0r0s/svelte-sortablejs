@@ -1,1 +1,3 @@
-![alt text](./docs/logo.png)
+<p align="center">
+  <img  src="./docs/logo.png">
+</p>

@@ -20,6 +20,9 @@
   export let clone = (item, evt) => ({ ...item, id: ID() });
   export let options = {};
   let el, sortable;
+  export function getSortable() {
+    return sortable;
+  }
   onMount(() => {
     sortable = sortablejs.create(el, {
       ...{
@@ -102,7 +105,6 @@
         options.onUpdate && options.onUpdate(evt);
       }
     });
-    el.sortable = sortable;
   });
 </script>
 
