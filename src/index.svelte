@@ -17,9 +17,8 @@
   } from "./utils";
   export let id = undefined;
   export let list = [];
-  export let setList = () => {};
   export let clone = (item, evt) => ({ ...item, id: ID() });
-  export let options = {};
+  export let options = { animation: 0 };
   let el, sortable;
 
   onMount(() => {
@@ -37,7 +36,7 @@
         const customs = createCustoms(evt, otherList);
         removeNodes(customs);
         const newList = handleStateAdd(customs, list);
-        setList(newList);
+        list = newList;
       },
       onRemove(evt) {
         const mode = getMode(evt);
@@ -86,14 +85,14 @@
 
         // remove item.selected from list
         newList = newList.map(item => ({ ...item, selected: false }));
-        setList(newList);
+        list = newList;
       },
       onUpdate(evt) {
         const customs = createCustoms(evt, list);
         removeNodes(customs);
         insertNodes(customs);
         const newList = handleStateChanges(customs, list);
-        return setList(newList);
+        list = newList;
       }
     });
   });

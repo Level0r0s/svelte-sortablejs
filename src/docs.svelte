@@ -17,11 +17,22 @@
     { id: "_wario", name: "wario", color: "yellow" },
     { id: "_waluigi", name: "waluigi", color: "purple" }
   ];
-  function setList(newList) {
-    list = newList;
+
+  function addtoList() {
+    list.push({
+      id: "add_" + Math.random().toString(36),
+      name: "new item",
+      color: "orange"
+    });
+    list = list;
   }
-  function setList2(newList) {
-    list2 = newList;
+  function addtoList2() {
+    list2.push({
+      id: "add_" + Math.random().toString(36),
+      name: "new item",
+      color: "pink"
+    });
+    list2 = list2;
   }
 </script>
 
@@ -54,20 +65,26 @@
 </style>
 
 <div id="docs">
-  <div id="console-a">{JSON.stringify(list, 0, 4)}</div>
-  <Sortable id="sortable-a" {options} {list} {setList}>
+  <div id="console-a">
+    <button on:click={addtoList}>Add</button>
+    {JSON.stringify(list, 0, 4)}
+  </div>
+  <Sortable id="sortable-a" {options} bind:list>
     {#each list as item}
       <li data-id={item.id} class="item" style="background:{item.color};">
         {item.name}
       </li>
     {/each}
   </Sortable>
-  <Sortable id="sortable-b" options={options2} list={list2} setList={setList2}>
+  <Sortable id="sortable-b" options={options2} bind:list={list2}>
     {#each list2 as item}
       <li data-id={item.id} class="item" style="background:{item.color};">
         {item.name}
       </li>
     {/each}
   </Sortable>
-  <div id="console-b">{JSON.stringify(list2, 0, 4)}</div>
+  <div id="console-b">
+    <button on:click={addtoList2}>Add</button>
+    {JSON.stringify(list2, 0, 4)}
+  </div>
 </div>
