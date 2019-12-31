@@ -64,10 +64,11 @@
   #todos {
     display: flex;
     flex-flow: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     flex: 1;
-    overflow: hidden;
+    overflow: auto;
   }
   .console {
     white-space: pre;

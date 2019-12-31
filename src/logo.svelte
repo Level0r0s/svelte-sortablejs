@@ -51,6 +51,8 @@
     background: #b63409;
     z-index: 1;
     transform: perspective(70px) rotateY(-15deg);
+    position: relative;
+    top: -2px;
   }
 </style>
 

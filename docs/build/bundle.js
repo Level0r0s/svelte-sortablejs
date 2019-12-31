@@ -4189,17 +4189,17 @@ var sveltesortabledocs = (function () {
     			t5 = space();
     			h1 = element("h1");
     			h1.textContent = "The sorting library for svelte";
-    			attr_dev(div0, "class", "segment svelte-1vq23cl");
-    			add_location(div0, file$1, 57, 2, 1125);
-    			attr_dev(div1, "class", "segment svelte-1vq23cl");
-    			add_location(div1, file$1, 58, 2, 1159);
-    			attr_dev(div2, "class", "segment svelte-1vq23cl");
-    			add_location(div2, file$1, 59, 2, 1193);
-    			attr_dev(h1, "class", "svelte-1vq23cl");
-    			add_location(h1, file$1, 60, 2, 1226);
+    			attr_dev(div0, "class", "segment svelte-frhvsy");
+    			add_location(div0, file$1, 59, 2, 1166);
+    			attr_dev(div1, "class", "segment svelte-frhvsy");
+    			add_location(div1, file$1, 60, 2, 1200);
+    			attr_dev(div2, "class", "segment svelte-frhvsy");
+    			add_location(div2, file$1, 61, 2, 1234);
+    			attr_dev(h1, "class", "svelte-frhvsy");
+    			add_location(h1, file$1, 62, 2, 1267);
     			attr_dev(div3, "id", "logo");
-    			attr_dev(div3, "class", "svelte-1vq23cl");
-    			add_location(div3, file$1, 56, 0, 1106);
+    			attr_dev(div3, "class", "svelte-frhvsy");
+    			add_location(div3, file$1, 58, 0, 1147);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4262,7 +4262,7 @@ var sveltesortabledocs = (function () {
     	return child_ctx;
     }
 
-    // (183:8) {#each list as todo (todo.id)}
+    // (184:8) {#each list as todo (todo.id)}
     function create_each_block_1(key_1, ctx) {
     	let li;
     	let t0_value = /*todo*/ ctx[12].name + "";
@@ -4290,12 +4290,12 @@ var sveltesortabledocs = (function () {
     			button = element("button");
     			t2 = text("Delete");
     			t3 = space();
-    			attr_dev(button, "class", "delete-button svelte-gjqavr");
+    			attr_dev(button, "class", "delete-button svelte-1ahphx6");
     			attr_dev(button, "data-id", button_data_id_value = /*todo*/ ctx[12].id);
-    			add_location(button, file$2, 190, 12, 4206);
+    			add_location(button, file$2, 191, 12, 4226);
     			attr_dev(li, "data-id", li_data_id_value = /*todo*/ ctx[12].id);
-    			attr_dev(li, "class", "todo svelte-gjqavr");
-    			add_location(li, file$2, 183, 10, 3976);
+    			attr_dev(li, "class", "todo svelte-1ahphx6");
+    			add_location(li, file$2, 184, 10, 3996);
     			dispose = listen_dev(button, "click", /*deleteTodo*/ ctx[8], false, false, false);
     			this.first = li;
     		},
@@ -4358,14 +4358,14 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_each_block_1.name,
     		type: "each",
-    		source: "(183:8) {#each list as todo (todo.id)}",
+    		source: "(184:8) {#each list as todo (todo.id)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (182:6) <Sortable {options} bind:list>
+    // (183:6) <Sortable {options} bind:list>
     function create_default_slot_1(ctx) {
     	let each_blocks = [];
     	let each_1_lookup = new Map();
@@ -4433,14 +4433,14 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(182:6) <Sortable {options} bind:list>",
+    		source: "(183:6) <Sortable {options} bind:list>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (204:8) {#each list2 as todo (todo.id)}
+    // (205:8) {#each list2 as todo (todo.id)}
     function create_each_block(key_1, ctx) {
     	let li;
     	let t0_value = /*todo*/ ctx[12].name + "";
@@ -4461,8 +4461,8 @@ var sveltesortabledocs = (function () {
     			t0 = text(t0_value);
     			t1 = space();
     			attr_dev(li, "data-id", li_data_id_value = /*todo*/ ctx[12].id);
-    			attr_dev(li, "class", "todo svelte-gjqavr");
-    			add_location(li, file$2, 204, 10, 4602);
+    			attr_dev(li, "class", "todo svelte-1ahphx6");
+    			add_location(li, file$2, 205, 10, 4622);
     			this.first = li;
     		},
     		m: function mount(target, anchor) {
@@ -4516,14 +4516,14 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(204:8) {#each list2 as todo (todo.id)}",
+    		source: "(205:8) {#each list2 as todo (todo.id)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (203:6) <Sortable options={options2} bind:list={list2}>
+    // (204:6) <Sortable options={options2} bind:list={list2}>
     function create_default_slot(ctx) {
     	let each_blocks = [];
     	let each_1_lookup = new Map();
@@ -4591,7 +4591,7 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(203:6) <Sortable options={options2} bind:list={list2}>",
+    		source: "(204:6) <Sortable options={options2} bind:list={list2}>",
     		ctx
     	});
 
@@ -4697,35 +4697,35 @@ var sveltesortabledocs = (function () {
     			t12 = text(t12_value);
     			attr_dev(input, "placeholder", "What to procrastinate");
     			attr_dev(input, "type", "text");
-    			attr_dev(input, "class", "svelte-gjqavr");
-    			add_location(input, file$2, 172, 6, 3583);
+    			attr_dev(input, "class", "svelte-1ahphx6");
+    			add_location(input, file$2, 173, 6, 3603);
     			button.disabled = button_disabled_value = !/*value*/ ctx[0];
-    			attr_dev(button, "class", "svelte-gjqavr");
-    			add_location(button, file$2, 173, 6, 3659);
+    			attr_dev(button, "class", "svelte-1ahphx6");
+    			add_location(button, file$2, 174, 6, 3679);
     			attr_dev(div0, "id", "input");
-    			attr_dev(div0, "class", "svelte-gjqavr");
-    			add_location(div0, file$2, 171, 4, 3559);
-    			add_location(div1, file$2, 169, 2, 3546);
-    			attr_dev(div2, "class", "console svelte-gjqavr");
-    			add_location(div2, file$2, 178, 4, 3764);
-    			attr_dev(h20, "class", "svelte-gjqavr");
-    			add_location(h20, file$2, 180, 6, 3867);
-    			attr_dev(div3, "class", "card svelte-gjqavr");
+    			attr_dev(div0, "class", "svelte-1ahphx6");
+    			add_location(div0, file$2, 172, 4, 3579);
+    			add_location(div1, file$2, 170, 2, 3566);
+    			attr_dev(div2, "class", "console svelte-1ahphx6");
+    			add_location(div2, file$2, 179, 4, 3784);
+    			attr_dev(h20, "class", "svelte-1ahphx6");
+    			add_location(h20, file$2, 181, 6, 3887);
+    			attr_dev(div3, "class", "card svelte-1ahphx6");
     			attr_dev(div3, "id", "incomplete");
-    			add_location(div3, file$2, 179, 4, 3825);
-    			attr_dev(h21, "class", "svelte-gjqavr");
-    			add_location(h21, file$2, 201, 6, 4477);
-    			attr_dev(div4, "class", "card svelte-gjqavr");
+    			add_location(div3, file$2, 180, 4, 3845);
+    			attr_dev(h21, "class", "svelte-1ahphx6");
+    			add_location(h21, file$2, 202, 6, 4497);
+    			attr_dev(div4, "class", "card svelte-1ahphx6");
     			attr_dev(div4, "id", "complete");
-    			add_location(div4, file$2, 200, 4, 4437);
-    			attr_dev(div5, "class", "console svelte-gjqavr");
-    			add_location(div5, file$2, 215, 4, 4889);
+    			add_location(div4, file$2, 201, 4, 4457);
+    			attr_dev(div5, "class", "console svelte-1ahphx6");
+    			add_location(div5, file$2, 216, 4, 4909);
     			attr_dev(div6, "id", "todos");
-    			attr_dev(div6, "class", "svelte-gjqavr");
-    			add_location(div6, file$2, 177, 2, 3742);
+    			attr_dev(div6, "class", "svelte-1ahphx6");
+    			add_location(div6, file$2, 178, 2, 3762);
     			attr_dev(div7, "id", "docs");
-    			attr_dev(div7, "class", "svelte-gjqavr");
-    			add_location(div7, file$2, 167, 0, 3515);
+    			attr_dev(div7, "class", "svelte-1ahphx6");
+    			add_location(div7, file$2, 168, 0, 3535);
 
     			dispose = [
     				listen_dev(input, "input", /*input_input_handler*/ ctx[9]),
