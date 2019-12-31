@@ -1,1 +1,1 @@
-# svelte-sortablejs
+![alt text](./docs/logo.png)
