@@ -127,8 +127,10 @@ var sveltesortabledocs = (function () {
     function children(element) {
         return Array.from(element.childNodes);
     }
-    function set_style(node, key, value, important) {
-        node.style.setProperty(key, value, important ? 'important' : '');
+    function set_input_value(input, value) {
+        if (value != null || input.value) {
+            input.value = value;
+        }
     }
     function custom_event(type, detail) {
         const e = document.createEvent('CustomEvent');
@@ -742,6 +744,10 @@ var sveltesortabledocs = (function () {
             dispatch_dev("SvelteDOMRemoveAttribute", { node, attribute });
         else
             dispatch_dev("SvelteDOMSetAttribute", { node, attribute, value });
+    }
+    function prop_dev(node, property, value) {
+        node[property] = value;
+        dispatch_dev("SvelteDOMSetProperty", { node, property, value });
     }
     function set_data_dev(text, data) {
         data = '' + data;
@@ -4166,6 +4172,8 @@ var sveltesortabledocs = (function () {
     	let div1;
     	let t3;
     	let div2;
+    	let t5;
+    	let h1;
 
     	const block = {
     		c: function create() {
@@ -4178,15 +4186,20 @@ var sveltesortabledocs = (function () {
     			t3 = space();
     			div2 = element("div");
     			div2.textContent = "LE";
-    			attr_dev(div0, "class", "segment svelte-1dfoz04");
-    			add_location(div0, file$1, 49, 2, 978);
-    			attr_dev(div1, "class", "segment svelte-1dfoz04");
-    			add_location(div1, file$1, 50, 2, 1012);
-    			attr_dev(div2, "class", "segment svelte-1dfoz04");
-    			add_location(div2, file$1, 51, 2, 1046);
+    			t5 = space();
+    			h1 = element("h1");
+    			h1.textContent = "The sorting library for svelte";
+    			attr_dev(div0, "class", "segment svelte-1vq23cl");
+    			add_location(div0, file$1, 57, 2, 1125);
+    			attr_dev(div1, "class", "segment svelte-1vq23cl");
+    			add_location(div1, file$1, 58, 2, 1159);
+    			attr_dev(div2, "class", "segment svelte-1vq23cl");
+    			add_location(div2, file$1, 59, 2, 1193);
+    			attr_dev(h1, "class", "svelte-1vq23cl");
+    			add_location(h1, file$1, 60, 2, 1226);
     			attr_dev(div3, "id", "logo");
-    			attr_dev(div3, "class", "svelte-1dfoz04");
-    			add_location(div3, file$1, 48, 0, 959);
+    			attr_dev(div3, "class", "svelte-1vq23cl");
+    			add_location(div3, file$1, 56, 0, 1106);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4198,6 +4211,8 @@ var sveltesortabledocs = (function () {
     			append_dev(div3, div1);
     			append_dev(div3, t3);
     			append_dev(div3, div2);
+    			append_dev(div3, t5);
+    			append_dev(div3, h1);
     		},
     		p: noop,
     		i: noop,
@@ -4237,28 +4252,33 @@ var sveltesortabledocs = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[10] = list[i];
+    	child_ctx[12] = list[i];
     	return child_ctx;
     }
 
     function get_each_context_1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[10] = list[i];
+    	child_ctx[12] = list[i];
     	return child_ctx;
     }
 
-    // (111:6) {#each list as item (item.id)}
+    // (183:8) {#each list as todo (todo.id)}
     function create_each_block_1(key_1, ctx) {
     	let li;
-    	let t0_value = /*item*/ ctx[10].name + "";
+    	let t0_value = /*todo*/ ctx[12].name + "";
     	let t0;
     	let t1;
+    	let button;
+    	let t2;
+    	let button_data_id_value;
+    	let t3;
     	let li_data_id_value;
     	let li_intro;
     	let li_outro;
     	let rect;
     	let stop_animation = noop;
     	let current;
+    	let dispose;
 
     	const block = {
     		key: key_1,
@@ -4267,27 +4287,36 @@ var sveltesortabledocs = (function () {
     			li = element("li");
     			t0 = text(t0_value);
     			t1 = space();
-    			attr_dev(li, "data-id", li_data_id_value = /*item*/ ctx[10].id);
-    			attr_dev(li, "class", "item svelte-y87848");
-    			set_style(li, "background", /*item*/ ctx[10].color);
-    			add_location(li, file$2, 111, 8, 2415);
+    			button = element("button");
+    			t2 = text("Delete");
+    			t3 = space();
+    			attr_dev(button, "class", "delete-button svelte-gjqavr");
+    			attr_dev(button, "data-id", button_data_id_value = /*todo*/ ctx[12].id);
+    			add_location(button, file$2, 190, 12, 4206);
+    			attr_dev(li, "data-id", li_data_id_value = /*todo*/ ctx[12].id);
+    			attr_dev(li, "class", "todo svelte-gjqavr");
+    			add_location(li, file$2, 183, 10, 3976);
+    			dispose = listen_dev(button, "click", /*deleteTodo*/ ctx[8], false, false, false);
     			this.first = li;
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
     			append_dev(li, t0);
     			append_dev(li, t1);
+    			append_dev(li, button);
+    			append_dev(button, t2);
+    			append_dev(li, t3);
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if ((!current || dirty & /*list*/ 1) && t0_value !== (t0_value = /*item*/ ctx[10].name + "")) set_data_dev(t0, t0_value);
+    			if ((!current || dirty & /*list*/ 2) && t0_value !== (t0_value = /*todo*/ ctx[12].name + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*list*/ 1 && li_data_id_value !== (li_data_id_value = /*item*/ ctx[10].id)) {
-    				attr_dev(li, "data-id", li_data_id_value);
+    			if (!current || dirty & /*list*/ 2 && button_data_id_value !== (button_data_id_value = /*todo*/ ctx[12].id)) {
+    				attr_dev(button, "data-id", button_data_id_value);
     			}
 
-    			if (!current || dirty & /*list*/ 1) {
-    				set_style(li, "background", /*item*/ ctx[10].color);
+    			if (!current || dirty & /*list*/ 2 && li_data_id_value !== (li_data_id_value = /*todo*/ ctx[12].id)) {
+    				attr_dev(li, "data-id", li_data_id_value);
     			}
     		},
     		r: function measure() {
@@ -4307,7 +4336,7 @@ var sveltesortabledocs = (function () {
 
     			add_render_callback(() => {
     				if (li_outro) li_outro.end(1);
-    				if (!li_intro) li_intro = create_in_transition(li, /*receive*/ ctx[3], { key: /*item*/ ctx[10].id });
+    				if (!li_intro) li_intro = create_in_transition(li, /*receive*/ ctx[4], { key: /*todo*/ ctx[12].id });
     				li_intro.start();
     			});
 
@@ -4315,12 +4344,13 @@ var sveltesortabledocs = (function () {
     		},
     		o: function outro(local) {
     			if (li_intro) li_intro.invalidate();
-    			li_outro = create_out_transition(li, /*send*/ ctx[2], { key: /*item*/ ctx[10].id });
+    			li_outro = create_out_transition(li, /*send*/ ctx[3], { key: /*todo*/ ctx[12].id });
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(li);
     			if (detaching && li_outro) li_outro.end();
+    			dispose();
     		}
     	};
 
@@ -4328,21 +4358,21 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_each_block_1.name,
     		type: "each",
-    		source: "(111:6) {#each list as item (item.id)}",
+    		source: "(183:8) {#each list as todo (todo.id)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (110:4) <Sortable id="sortable-a" {options} bind:list>
+    // (182:6) <Sortable {options} bind:list>
     function create_default_slot_1(ctx) {
     	let each_blocks = [];
     	let each_1_lookup = new Map();
     	let each_1_anchor;
     	let current;
-    	let each_value_1 = /*list*/ ctx[0];
-    	const get_key = ctx => /*item*/ ctx[10].id;
+    	let each_value_1 = /*list*/ ctx[1];
+    	const get_key = ctx => /*todo*/ ctx[12].id;
 
     	for (let i = 0; i < each_value_1.length; i += 1) {
     		let child_ctx = get_each_context_1(ctx, each_value_1, i);
@@ -4367,7 +4397,7 @@ var sveltesortabledocs = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			const each_value_1 = /*list*/ ctx[0];
+    			const each_value_1 = /*list*/ ctx[1];
     			group_outros();
     			for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
     			each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value_1, each_1_lookup, each_1_anchor.parentNode, fix_and_outro_and_destroy_block, create_each_block_1, each_1_anchor, get_each_context_1);
@@ -4403,17 +4433,17 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(110:4) <Sortable id=\\\"sortable-a\\\" {options} bind:list>",
+    		source: "(182:6) <Sortable {options} bind:list>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (124:6) {#each list2 as item (item.id)}
+    // (204:8) {#each list2 as todo (todo.id)}
     function create_each_block(key_1, ctx) {
     	let li;
-    	let t0_value = /*item*/ ctx[10].name + "";
+    	let t0_value = /*todo*/ ctx[12].name + "";
     	let t0;
     	let t1;
     	let li_data_id_value;
@@ -4430,10 +4460,9 @@ var sveltesortabledocs = (function () {
     			li = element("li");
     			t0 = text(t0_value);
     			t1 = space();
-    			attr_dev(li, "data-id", li_data_id_value = /*item*/ ctx[10].id);
-    			attr_dev(li, "class", "item svelte-y87848");
-    			set_style(li, "background", /*item*/ ctx[10].color);
-    			add_location(li, file$2, 124, 8, 2828);
+    			attr_dev(li, "data-id", li_data_id_value = /*todo*/ ctx[12].id);
+    			attr_dev(li, "class", "todo svelte-gjqavr");
+    			add_location(li, file$2, 204, 10, 4602);
     			this.first = li;
     		},
     		m: function mount(target, anchor) {
@@ -4443,14 +4472,10 @@ var sveltesortabledocs = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if ((!current || dirty & /*list2*/ 2) && t0_value !== (t0_value = /*item*/ ctx[10].name + "")) set_data_dev(t0, t0_value);
+    			if ((!current || dirty & /*list2*/ 4) && t0_value !== (t0_value = /*todo*/ ctx[12].name + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*list2*/ 2 && li_data_id_value !== (li_data_id_value = /*item*/ ctx[10].id)) {
+    			if (!current || dirty & /*list2*/ 4 && li_data_id_value !== (li_data_id_value = /*todo*/ ctx[12].id)) {
     				attr_dev(li, "data-id", li_data_id_value);
-    			}
-
-    			if (!current || dirty & /*list2*/ 2) {
-    				set_style(li, "background", /*item*/ ctx[10].color);
     			}
     		},
     		r: function measure() {
@@ -4470,7 +4495,7 @@ var sveltesortabledocs = (function () {
 
     			add_render_callback(() => {
     				if (li_outro) li_outro.end(1);
-    				if (!li_intro) li_intro = create_in_transition(li, /*receive*/ ctx[3], { key: /*item*/ ctx[10].id });
+    				if (!li_intro) li_intro = create_in_transition(li, /*receive*/ ctx[4], { key: /*todo*/ ctx[12].id });
     				li_intro.start();
     			});
 
@@ -4478,7 +4503,7 @@ var sveltesortabledocs = (function () {
     		},
     		o: function outro(local) {
     			if (li_intro) li_intro.invalidate();
-    			li_outro = create_out_transition(li, /*send*/ ctx[2], { key: /*item*/ ctx[10].id });
+    			li_outro = create_out_transition(li, /*send*/ ctx[3], { key: /*todo*/ ctx[12].id });
     			current = false;
     		},
     		d: function destroy(detaching) {
@@ -4491,21 +4516,21 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(124:6) {#each list2 as item (item.id)}",
+    		source: "(204:8) {#each list2 as todo (todo.id)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (123:4) <Sortable id="sortable-b" options={options2} bind:list={list2}>
+    // (203:6) <Sortable options={options2} bind:list={list2}>
     function create_default_slot(ctx) {
     	let each_blocks = [];
     	let each_1_lookup = new Map();
     	let each_1_anchor;
     	let current;
-    	let each_value = /*list2*/ ctx[1];
-    	const get_key = ctx => /*item*/ ctx[10].id;
+    	let each_value = /*list2*/ ctx[2];
+    	const get_key = ctx => /*todo*/ ctx[12].id;
 
     	for (let i = 0; i < each_value.length; i += 1) {
     		let child_ctx = get_each_context(ctx, each_value, i);
@@ -4530,7 +4555,7 @@ var sveltesortabledocs = (function () {
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			const each_value = /*list2*/ ctx[1];
+    			const each_value = /*list2*/ ctx[2];
     			group_outros();
     			for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
     			each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, each_1_anchor.parentNode, fix_and_outro_and_destroy_block, create_each_block, each_1_anchor, get_each_context);
@@ -4566,7 +4591,7 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(123:4) <Sortable id=\\\"sortable-b\\\" options={options2} bind:list={list2}>",
+    		source: "(203:6) <Sortable options={options2} bind:list={list2}>",
     		ctx
     	});
 
@@ -4574,59 +4599,67 @@ var sveltesortabledocs = (function () {
     }
 
     function create_fragment$2(ctx) {
-    	let div3;
+    	let div7;
     	let t0;
-    	let div2;
-    	let div0;
-    	let button0;
-    	let t2;
-    	let t3_value = JSON.stringify(/*list*/ ctx[0], 0, 4) + "";
-    	let t3;
-    	let t4;
-    	let updating_list;
-    	let t5;
-    	let updating_list_1;
-    	let t6;
     	let div1;
-    	let button1;
+    	let div0;
+    	let input;
+    	let t1;
+    	let button;
+    	let t2;
+    	let button_disabled_value;
+    	let t3;
+    	let div6;
+    	let div2;
+    	let t4_value = JSON.stringify(/*list*/ ctx[1], 0, 4) + "";
+    	let t4;
+    	let t5;
+    	let div3;
+    	let h20;
+    	let t7;
+    	let updating_list;
     	let t8;
-    	let t9_value = JSON.stringify(/*list2*/ ctx[1], 0, 4) + "";
-    	let t9;
+    	let div4;
+    	let h21;
+    	let t10;
+    	let updating_list_1;
+    	let t11;
+    	let div5;
+    	let t12_value = JSON.stringify(/*list2*/ ctx[2], 0, 4) + "";
+    	let t12;
     	let current;
     	let dispose;
     	const logo = new Logo({ $$inline: true });
 
-    	function sortable0_list_binding(value) {
-    		/*sortable0_list_binding*/ ctx[8].call(null, value);
+    	function sortable0_list_binding(value_1) {
+    		/*sortable0_list_binding*/ ctx[10].call(null, value_1);
     	}
 
     	let sortable0_props = {
-    		id: "sortable-a",
-    		options: /*options*/ ctx[4],
+    		options: /*options*/ ctx[5],
     		$$slots: { default: [create_default_slot_1] },
     		$$scope: { ctx }
     	};
 
-    	if (/*list*/ ctx[0] !== void 0) {
-    		sortable0_props.list = /*list*/ ctx[0];
+    	if (/*list*/ ctx[1] !== void 0) {
+    		sortable0_props.list = /*list*/ ctx[1];
     	}
 
     	const sortable0 = new Src({ props: sortable0_props, $$inline: true });
     	binding_callbacks.push(() => bind(sortable0, "list", sortable0_list_binding));
 
-    	function sortable1_list_binding(value_1) {
-    		/*sortable1_list_binding*/ ctx[9].call(null, value_1);
+    	function sortable1_list_binding(value_2) {
+    		/*sortable1_list_binding*/ ctx[11].call(null, value_2);
     	}
 
     	let sortable1_props = {
-    		id: "sortable-b",
-    		options: /*options2*/ ctx[5],
+    		options: /*options2*/ ctx[6],
     		$$slots: { default: [create_default_slot] },
     		$$scope: { ctx }
     	};
 
-    	if (/*list2*/ ctx[1] !== void 0) {
-    		sortable1_props.list = /*list2*/ ctx[1];
+    	if (/*list2*/ ctx[2] !== void 0) {
+    		sortable1_props.list = /*list2*/ ctx[2];
     	}
 
     	const sortable1 = new Src({ props: sortable1_props, $$inline: true });
@@ -4634,97 +4667,141 @@ var sveltesortabledocs = (function () {
 
     	const block = {
     		c: function create() {
-    			div3 = element("div");
+    			div7 = element("div");
     			create_component(logo.$$.fragment);
     			t0 = space();
-    			div2 = element("div");
-    			div0 = element("div");
-    			button0 = element("button");
-    			button0.textContent = "Add";
-    			t2 = space();
-    			t3 = text(t3_value);
-    			t4 = space();
-    			create_component(sortable0.$$.fragment);
-    			t5 = space();
-    			create_component(sortable1.$$.fragment);
-    			t6 = space();
     			div1 = element("div");
-    			button1 = element("button");
-    			button1.textContent = "Add";
+    			div0 = element("div");
+    			input = element("input");
+    			t1 = space();
+    			button = element("button");
+    			t2 = text("+");
+    			t3 = space();
+    			div6 = element("div");
+    			div2 = element("div");
+    			t4 = text(t4_value);
+    			t5 = space();
+    			div3 = element("div");
+    			h20 = element("h2");
+    			h20.textContent = "Incomplete";
+    			t7 = space();
+    			create_component(sortable0.$$.fragment);
     			t8 = space();
-    			t9 = text(t9_value);
-    			add_location(button0, file$2, 106, 6, 2226);
-    			attr_dev(div0, "id", "console-a");
-    			attr_dev(div0, "class", "svelte-y87848");
-    			add_location(div0, file$2, 105, 4, 2198);
-    			add_location(button1, file$2, 136, 6, 3157);
-    			attr_dev(div1, "id", "console-b");
-    			attr_dev(div1, "class", "svelte-y87848");
-    			add_location(div1, file$2, 135, 4, 3129);
-    			attr_dev(div2, "id", "todos");
-    			attr_dev(div2, "class", "svelte-y87848");
-    			add_location(div2, file$2, 104, 2, 2176);
-    			attr_dev(div3, "id", "docs");
-    			attr_dev(div3, "class", "svelte-y87848");
-    			add_location(div3, file$2, 102, 0, 2145);
+    			div4 = element("div");
+    			h21 = element("h2");
+    			h21.textContent = "Complete";
+    			t10 = space();
+    			create_component(sortable1.$$.fragment);
+    			t11 = space();
+    			div5 = element("div");
+    			t12 = text(t12_value);
+    			attr_dev(input, "placeholder", "What to procrastinate");
+    			attr_dev(input, "type", "text");
+    			attr_dev(input, "class", "svelte-gjqavr");
+    			add_location(input, file$2, 172, 6, 3583);
+    			button.disabled = button_disabled_value = !/*value*/ ctx[0];
+    			attr_dev(button, "class", "svelte-gjqavr");
+    			add_location(button, file$2, 173, 6, 3659);
+    			attr_dev(div0, "id", "input");
+    			attr_dev(div0, "class", "svelte-gjqavr");
+    			add_location(div0, file$2, 171, 4, 3559);
+    			add_location(div1, file$2, 169, 2, 3546);
+    			attr_dev(div2, "class", "console svelte-gjqavr");
+    			add_location(div2, file$2, 178, 4, 3764);
+    			attr_dev(h20, "class", "svelte-gjqavr");
+    			add_location(h20, file$2, 180, 6, 3867);
+    			attr_dev(div3, "class", "card svelte-gjqavr");
+    			attr_dev(div3, "id", "incomplete");
+    			add_location(div3, file$2, 179, 4, 3825);
+    			attr_dev(h21, "class", "svelte-gjqavr");
+    			add_location(h21, file$2, 201, 6, 4477);
+    			attr_dev(div4, "class", "card svelte-gjqavr");
+    			attr_dev(div4, "id", "complete");
+    			add_location(div4, file$2, 200, 4, 4437);
+    			attr_dev(div5, "class", "console svelte-gjqavr");
+    			add_location(div5, file$2, 215, 4, 4889);
+    			attr_dev(div6, "id", "todos");
+    			attr_dev(div6, "class", "svelte-gjqavr");
+    			add_location(div6, file$2, 177, 2, 3742);
+    			attr_dev(div7, "id", "docs");
+    			attr_dev(div7, "class", "svelte-gjqavr");
+    			add_location(div7, file$2, 167, 0, 3515);
 
     			dispose = [
-    				listen_dev(button0, "click", /*addtoList*/ ctx[6], false, false, false),
-    				listen_dev(button1, "click", /*addtoList2*/ ctx[7], false, false, false)
+    				listen_dev(input, "input", /*input_input_handler*/ ctx[9]),
+    				listen_dev(button, "click", /*addTodo*/ ctx[7], false, false, false)
     			];
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, div3, anchor);
-    			mount_component(logo, div3, null);
-    			append_dev(div3, t0);
-    			append_dev(div3, div2);
-    			append_dev(div2, div0);
-    			append_dev(div0, button0);
-    			append_dev(div0, t2);
-    			append_dev(div0, t3);
+    			insert_dev(target, div7, anchor);
+    			mount_component(logo, div7, null);
+    			append_dev(div7, t0);
+    			append_dev(div7, div1);
+    			append_dev(div1, div0);
+    			append_dev(div0, input);
+    			set_input_value(input, /*value*/ ctx[0]);
+    			append_dev(div0, t1);
+    			append_dev(div0, button);
+    			append_dev(button, t2);
+    			append_dev(div7, t3);
+    			append_dev(div7, div6);
+    			append_dev(div6, div2);
     			append_dev(div2, t4);
-    			mount_component(sortable0, div2, null);
-    			append_dev(div2, t5);
-    			mount_component(sortable1, div2, null);
-    			append_dev(div2, t6);
-    			append_dev(div2, div1);
-    			append_dev(div1, button1);
-    			append_dev(div1, t8);
-    			append_dev(div1, t9);
+    			append_dev(div6, t5);
+    			append_dev(div6, div3);
+    			append_dev(div3, h20);
+    			append_dev(div3, t7);
+    			mount_component(sortable0, div3, null);
+    			append_dev(div6, t8);
+    			append_dev(div6, div4);
+    			append_dev(div4, h21);
+    			append_dev(div4, t10);
+    			mount_component(sortable1, div4, null);
+    			append_dev(div6, t11);
+    			append_dev(div6, div5);
+    			append_dev(div5, t12);
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			if ((!current || dirty & /*list*/ 1) && t3_value !== (t3_value = JSON.stringify(/*list*/ ctx[0], 0, 4) + "")) set_data_dev(t3, t3_value);
+    			if (dirty & /*value*/ 1 && input.value !== /*value*/ ctx[0]) {
+    				set_input_value(input, /*value*/ ctx[0]);
+    			}
+
+    			if (!current || dirty & /*value*/ 1 && button_disabled_value !== (button_disabled_value = !/*value*/ ctx[0])) {
+    				prop_dev(button, "disabled", button_disabled_value);
+    			}
+
+    			if ((!current || dirty & /*list*/ 2) && t4_value !== (t4_value = JSON.stringify(/*list*/ ctx[1], 0, 4) + "")) set_data_dev(t4, t4_value);
     			const sortable0_changes = {};
 
-    			if (dirty & /*$$scope, list*/ 32769) {
+    			if (dirty & /*$$scope, list*/ 131074) {
     				sortable0_changes.$$scope = { dirty, ctx };
     			}
 
-    			if (!updating_list && dirty & /*list*/ 1) {
+    			if (!updating_list && dirty & /*list*/ 2) {
     				updating_list = true;
-    				sortable0_changes.list = /*list*/ ctx[0];
+    				sortable0_changes.list = /*list*/ ctx[1];
     				add_flush_callback(() => updating_list = false);
     			}
 
     			sortable0.$set(sortable0_changes);
     			const sortable1_changes = {};
 
-    			if (dirty & /*$$scope, list2*/ 32770) {
+    			if (dirty & /*$$scope, list2*/ 131076) {
     				sortable1_changes.$$scope = { dirty, ctx };
     			}
 
-    			if (!updating_list_1 && dirty & /*list2*/ 2) {
+    			if (!updating_list_1 && dirty & /*list2*/ 4) {
     				updating_list_1 = true;
-    				sortable1_changes.list = /*list2*/ ctx[1];
+    				sortable1_changes.list = /*list2*/ ctx[2];
     				add_flush_callback(() => updating_list_1 = false);
     			}
 
     			sortable1.$set(sortable1_changes);
-    			if ((!current || dirty & /*list2*/ 2) && t9_value !== (t9_value = JSON.stringify(/*list2*/ ctx[1], 0, 4) + "")) set_data_dev(t9, t9_value);
+    			if ((!current || dirty & /*list2*/ 4) && t12_value !== (t12_value = JSON.stringify(/*list2*/ ctx[2], 0, 4) + "")) set_data_dev(t12, t12_value);
     		},
     		i: function intro(local) {
     			if (current) return;
@@ -4740,7 +4817,7 @@ var sveltesortabledocs = (function () {
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div3);
+    			if (detaching) detach_dev(div7);
     			destroy_component(logo);
     			destroy_component(sortable0);
     			destroy_component(sortable1);
@@ -4760,6 +4837,8 @@ var sveltesortabledocs = (function () {
     }
 
     function instance$1($$self, $$props, $$invalidate) {
+    	let value = "";
+
     	const [send, receive] = crossfade({
     		duration: d => Math.sqrt(d * 200),
     		fallback(node, params) {
@@ -4777,63 +4856,39 @@ var sveltesortabledocs = (function () {
     		}
     	});
 
-    	let options = { group: "people", draggable: ".item" };
-    	let options2 = { group: "people", draggable: ".item" };
+    	let options = { group: "people", draggable: ".todo" };
+    	let options2 = { group: "people", draggable: ".todo" };
+    	let list = [{ id: "_dodishes", name: "Do the dishes" }];
+    	let list2 = [];
 
-    	let list = [
-    		{
-    			id: "_mario",
-    			name: "mario",
-    			color: "red"
-    		},
-    		{
-    			id: "_luigi",
-    			name: "luigi",
-    			color: "greenyellow"
-    		}
-    	];
-
-    	let list2 = [
-    		{
-    			id: "_wario",
-    			name: "wario",
-    			color: "yellow"
-    		},
-    		{
-    			id: "_waluigi",
-    			name: "waluigi",
-    			color: "purple"
-    		}
-    	];
-
-    	function addtoList() {
+    	function addTodo() {
     		list.push({
-    			id: "add_" + Math.random().toString(36),
-    			name: "new item",
-    			color: "orange"
+    			id: "todo_" + Math.random().toString(36),
+    			name: value
     		});
 
-    		$$invalidate(0, list);
+    		$$invalidate(0, value = "");
+    		$$invalidate(1, list);
     	}
 
-    	function addtoList2() {
-    		list2.push({
-    			id: "add_" + Math.random().toString(36),
-    			name: "new item",
-    			color: "pink"
-    		});
-
-    		$$invalidate(1, list2);
+    	function deleteTodo(evt) {
+    		const id = evt.target.getAttribute("data-id");
+    		$$invalidate(1, list = list.filter(item => item.id !== id));
     	}
 
-    	function sortable0_list_binding(value) {
-    		list = value;
-    		$$invalidate(0, list);
+    	function input_input_handler() {
+    		value = this.value;
+    		$$invalidate(0, value);
     	}
 
-    	function sortable1_list_binding(value_1) {
-    		list2 = value_1;
-    		$$invalidate(1, list2);
+    	function sortable0_list_binding(value_1) {
+    		list = value_1;
+    		$$invalidate(1, list);
+    	}
+
+    	function sortable1_list_binding(value_2) {
+    		list2 = value_2;
+    		$$invalidate(2, list2);
     	}
 
     	$$self.$capture_state = () => {
@@ -4841,21 +4896,24 @@ var sveltesortabledocs = (function () {
     	};
 
     	$$self.$inject_state = $$props => {
-    		if ("options" in $$props) $$invalidate(4, options = $$props.options);
-    		if ("options2" in $$props) $$invalidate(5, options2 = $$props.options2);
-    		if ("list" in $$props) $$invalidate(0, list = $$props.list);
-    		if ("list2" in $$props) $$invalidate(1, list2 = $$props.list2);
+    		if ("value" in $$props) $$invalidate(0, value = $$props.value);
+    		if ("options" in $$props) $$invalidate(5, options = $$props.options);
+    		if ("options2" in $$props) $$invalidate(6, options2 = $$props.options2);
+    		if ("list" in $$props) $$invalidate(1, list = $$props.list);
+    		if ("list2" in $$props) $$invalidate(2, list2 = $$props.list2);
     	};
 
     	return [
+    		value,
     		list,
     		list2,
     		send,
     		receive,
     		options,
     		options2,
-    		addtoList,
-    		addtoList2,
+    		addTodo,
+    		deleteTodo,
+    		input_input_handler,
     		sortable0_list_binding,
     		sortable1_list_binding
     	];

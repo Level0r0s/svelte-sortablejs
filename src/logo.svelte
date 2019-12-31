@@ -6,8 +6,16 @@
   #logo {
     display: flex;
     flex-flow: column;
-    align-items: flex-start;
+    align-items: center;
     align-self: center;
+    justify-content: center;
+    height: 300px;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 100;
+    font-size: 40px;
+    color: grey;
   }
   .segment {
     text-align: center;
@@ -50,4 +58,5 @@
   <div class="segment">SOR</div>
   <div class="segment">TAB</div>
   <div class="segment">LE</div>
+  <h1>The sorting library for svelte</h1>
 </div>

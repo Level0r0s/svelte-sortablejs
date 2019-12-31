@@ -6,6 +6,8 @@
 
   import Logo from "./logo.svelte";
 
+  let value = "";
+
   const [send, receive] = crossfade({
     duration: d => Math.sqrt(d * 200),
 
@@ -26,36 +28,26 @@
 
   let options = {
     group: "people",
-    draggable: ".item"
+    draggable: ".todo"
   };
   let options2 = {
     group: "people",
-    draggable: ".item"
+    draggable: ".todo"
   };
-  let list = [
-    { id: "_mario", name: "mario", color: "red" },
-    { id: "_luigi", name: "luigi", color: "greenyellow" }
-  ];
-  let list2 = [
-    { id: "_wario", name: "wario", color: "yellow" },
-    { id: "_waluigi", name: "waluigi", color: "purple" }
-  ];
+  let list = [{ id: "_dodishes", name: "Do the dishes" }];
+  let list2 = [];
 
-  function addtoList() {
+  function addTodo() {
     list.push({
-      id: "add_" + Math.random().toString(36),
-      name: "new item",
-      color: "orange"
+      id: "todo_" + Math.random().toString(36),
+      name: value
     });
+    value = "";
     list = list;
   }
-  function addtoList2() {
-    list2.push({
-      id: "add_" + Math.random().toString(36),
-      name: "new item",
-      color: "pink"
-    });
-    list2 = list2;
+  function deleteTodo(evt) {
+    const id = evt.target.getAttribute("data-id");
+    list = list.filter(item => item.id !== id);
   }
 </script>
 
@@ -64,8 +56,9 @@
     display: flex;
     flex-flow: column;
     align-items: stretch;
-    justify-content: space-around;
+    justify-content: flex-start;
     height: 100%;
+    width: 100%;
   }
 
   #todos {
@@ -73,69 +66,153 @@
     flex-flow: row;
     justify-content: space-between;
     align-items: center;
+    flex: 1;
+    overflow: hidden;
   }
-  #console-a {
+  .console {
     white-space: pre;
     font-family: monospace;
     font-weight: bold;
+    width: 300px;
+    height: 100%;
+    overflow: auto;
+    padding: 5px;
+    background: white;
+    color: #d33906;
+    font-size: 12px;
+    font-weight: 500px;
   }
-  :global(#sortable-a) {
+  #input {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding: 20px 0px;
+  }
+  #input > input {
+    padding: 10px;
+    border-right: none;
+    font-size: 20px;
+    margin: 0px;
+  }
+  #input > button {
+    margin: 0px;
+  }
+  #input > button:not(:disabled) {
+    color: #ff3e00;
+  }
+  :global(#incomplete) {
     flex: 1;
+    height: 300px;
+    transform: perspective(50px) rotateY(5deg);
+    box-shadow: -9px 9px 0px rgba(0, 0, 0, 0.05);
   }
-  :global(#sortable-b) {
+  :global(#complete > .svelte-sortable > li) {
+    text-decoration: line-through;
+    background: #c7ffc7;
+  }
+  :global(#complete) {
     flex: 1;
+    height: 300px;
+    transform: perspective(50px) rotateY(-5deg);
+    box-shadow: 9px 9px 0px rgba(0, 0, 0, 0.05);
   }
-  #console-b {
-    white-space: pre;
-    font-family: monospace;
-    font-weight: bold;
-  }
-  .item {
+  .todo {
     list-style: none;
     display: block;
-    box-shadow: 0 0 0 2px black;
-    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
     user-select: none;
     cursor: grab;
+    border-top: 1px solid lightgrey;
+    color: grey;
+  }
+  .todo:last-of-type {
+    border-bottom: 1px solid lightgrey;
+  }
+
+  .card {
+    border: 1px solid lightgray;
+    padding: 0px;
+    display: flex;
+    flex-flow: column;
+    margin: 0px 40px;
+  }
+  .card > h2 {
+    font-weight: 100;
+    border-bottom: 1px solid lightgray;
+    margin: 0px;
+    padding: 10px;
+    margin-bottom: 5px;
+  }
+  .card > :global(.svelte-sortable) {
+    width: 100%;
+    min-height: 50px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .delete-button {
+    padding: 0px;
+    border: none;
+    background: none;
+    outline: none;
+    fill: grey;
+    margin: 0px;
+    cursor: pointer;
   }
 </style>
 
 <div id="docs">
   <Logo />
+  <div>
+
+    <div id="input">
+      <input bind:value placeholder="What to procrastinate" type="text" />
+      <button disabled={!value} on:click={addTodo}>+</button>
+    </div>
+
+  </div>
   <div id="todos">
-    <div id="console-a">
-      <button on:click={addtoList}>Add</button>
-      {JSON.stringify(list, 0, 4)}
+    <div class="console">{JSON.stringify(list, 0, 4)}</div>
+    <div class="card" id="incomplete">
+      <h2>Incomplete</h2>
+      <Sortable {options} bind:list>
+        {#each list as todo (todo.id)}
+          <li
+            in:receive={{ key: todo.id }}
+            out:send={{ key: todo.id }}
+            animate:flip={{ duration: 250 }}
+            data-id={todo.id}
+            class="todo">
+            {todo.name}
+            <button
+              class="delete-button"
+              data-id={todo.id}
+              on:click={deleteTodo}>
+              Delete
+            </button>
+          </li>
+        {/each}
+      </Sortable>
     </div>
-    <Sortable id="sortable-a" {options} bind:list>
-      {#each list as item (item.id)}
-        <li
-          in:receive={{ key: item.id }}
-          out:send={{ key: item.id }}
-          animate:flip={{ duration: 250 }}
-          data-id={item.id}
-          class="item"
-          style="background:{item.color};">
-          {item.name}
-        </li>
-      {/each}
-    </Sortable>
-    <Sortable id="sortable-b" options={options2} bind:list={list2}>
-      {#each list2 as item (item.id)}
-        <li
-          in:receive={{ key: item.id }}
-          out:send={{ key: item.id }}
-          animate:flip={{ duration: 250 }}
-          data-id={item.id}
-          class="item"
-          style="background:{item.color};">
-          {item.name}
-        </li>
-      {/each}
-    </Sortable>
-    <div id="console-b">
-      <button on:click={addtoList2}>Add</button>
-      {JSON.stringify(list2, 0, 4)}
+    <div class="card" id="complete">
+      <h2>Complete</h2>
+      <Sortable options={options2} bind:list={list2}>
+        {#each list2 as todo (todo.id)}
+          <li
+            in:receive={{ key: todo.id }}
+            out:send={{ key: todo.id }}
+            animate:flip={{ duration: 250 }}
+            data-id={todo.id}
+            class="todo">
+            {todo.name}
+          </li>
+        {/each}
+      </Sortable>
     </div>
+    <div class="console">{JSON.stringify(list2, 0, 4)}</div>
   </div>
 </div>
