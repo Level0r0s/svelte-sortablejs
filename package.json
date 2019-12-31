@@ -8,9 +8,9 @@
   "scripts": {
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
-    "build-docs": "rollup --config rollup.config.dev.js -c",
-    "dev": "rollup --config rollup.config.dev.js -c -w",
-    "start": "sirv public"
+    "build-docs": "rollup -c --config rollup.config.dev.js",
+    "dev": "rollup -c -w --config rollup.config.dev.js",
+    "start": "sirv docs"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^11.0.0",

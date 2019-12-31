@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "file": "bundle.css",
+  "sources": [
+    "..\\..\\docs.svelte"
+  ],
+  "sourcesContent": [
+    "<script>\r\n  import Sortable from \"./index.svelte\";\r\n\r\n  let options = {\r\n    group: \"people\",\r\n    draggable: \".item\"\r\n  };\r\n  let options2 = {\r\n    group: \"people\",\r\n    draggable: \".item\"\r\n  };\r\n  let list = [\r\n    { id: \"_mario\", name: \"mario\", color: \"red\" },\r\n    { id: \"_luigi\", name: \"luigi\", color: \"greenyellow\" }\r\n  ];\r\n  let list2 = [\r\n    { id: \"_wario\", name: \"wario\", color: \"yellow\" },\r\n    { id: \"_waluigi\", name: \"waluigi\", color: \"purple\" }\r\n  ];\r\n  function setList(newList) {\r\n    list = newList;\r\n  }\r\n  function setList2(newList) {\r\n    list2 = newList;\r\n  }\r\n</script>\r\n\r\n<style>\r\n  #docs {\r\n    display: flex;\r\n  }\r\n  #console-a {\r\n    white-space: pre;\r\n    font-family: monospace;\r\n    font-weight: bold;\r\n  }\r\n  #console-b {\r\n    white-space: pre;\r\n    font-family: monospace;\r\n    font-weight: bold;\r\n  }\r\n  :global(#sortable-a) {\r\n    flex: 1;\r\n  }\r\n  :global(#sortable-b) {\r\n    flex: 1;\r\n  }\r\n  .item {\r\n    list-style: none;\r\n    display: block;\r\n    box-shadow: 0 0 0 2px black;\r\n    padding: 5px;\r\n  }\r\n</style>\r\n\r\n<div id=\"docs\">\r\n  <div id=\"console-a\">{JSON.stringify(list, 0, 4)}</div>\r\n  <Sortable id=\"sortable-a\" {options} {list} {setList}>\r\n    {#each list as item}\r\n      <li data-id={item.id} class=\"item\" style=\"background:{item.color};\">\r\n        {item.name}\r\n      </li>\r\n    {/each}\r\n  </Sortable>\r\n  <Sortable id=\"sortable-b\" options={options2} list={list2} setList={setList2}>\r\n    {#each list2 as item}\r\n      <li data-id={item.id} class=\"item\" style=\"background:{item.color};\">\r\n        {item.name}\r\n      </li>\r\n    {/each}\r\n  </Sortable>\r\n  <div id=\"console-b\">{JSON.stringify(list2, 0, 4)}</div>\r\n</div>\r\n"
+  ],
+  "names": [],
+  "mappings": "AA4BE,KAAK,cAAC,CAAC,AACL,OAAO,CAAE,IAAI,AACf,CAAC,AACD,UAAU,cAAC,CAAC,AACV,WAAW,CAAE,GAAG,CAChB,WAAW,CAAE,SAAS,CACtB,WAAW,CAAE,IAAI,AACnB,CAAC,AACD,UAAU,cAAC,CAAC,AACV,WAAW,CAAE,GAAG,CAChB,WAAW,CAAE,SAAS,CACtB,WAAW,CAAE,IAAI,AACnB,CAAC,AACO,WAAW,AAAE,CAAC,AACpB,IAAI,CAAE,CAAC,AACT,CAAC,AACO,WAAW,AAAE,CAAC,AACpB,IAAI,CAAE,CAAC,AACT,CAAC,AACD,KAAK,cAAC,CAAC,AACL,UAAU,CAAE,IAAI,CAChB,OAAO,CAAE,KAAK,CACd,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,KAAK,CAC3B,OAAO,CAAE,GAAG,AACd,CAAC"
+}
