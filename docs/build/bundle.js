@@ -334,35 +334,8 @@ var sveltesortabledocs = (function () {
             $$.after_update.forEach(add_render_callback);
         }
     }
-
-    let promise;
-    function wait() {
-        if (!promise) {
-            promise = Promise.resolve();
-            promise.then(() => {
-                promise = null;
-            });
-        }
-        return promise;
-    }
-    function dispatch(node, direction, kind) {
-        node.dispatchEvent(custom_event(`${direction ? 'intro' : 'outro'}${kind}`));
-    }
     const outroing = new Set();
     let outros;
-    function group_outros() {
-        outros = {
-            r: 0,
-            c: [],
-            p: outros // parent group
-        };
-    }
-    function check_outros() {
-        if (!outros.r) {
-            run_all(outros.c);
-        }
-        outros = outros.p;
-    }
     function transition_in(block, local) {
         if (block && block.i) {
             outroing.delete(block);
@@ -385,133 +358,14 @@ var sveltesortabledocs = (function () {
             block.o(local);
         }
     }
-    const null_transition = { duration: 0 };
-    function create_in_transition(node, fn, params) {
-        let config = fn(node, params);
-        let running = false;
-        let animation_name;
-        let task;
-        let uid = 0;
-        function cleanup() {
-            if (animation_name)
-                delete_rule(node, animation_name);
-        }
-        function go() {
-            const { delay = 0, duration = 300, easing = identity, tick = noop, css } = config || null_transition;
-            if (css)
-                animation_name = create_rule(node, 0, 1, duration, delay, easing, css, uid++);
-            tick(0, 1);
-            const start_time = now() + delay;
-            const end_time = start_time + duration;
-            if (task)
-                task.abort();
-            running = true;
-            add_render_callback(() => dispatch(node, true, 'start'));
-            task = loop(now => {
-                if (running) {
-                    if (now >= end_time) {
-                        tick(1, 0);
-                        dispatch(node, true, 'end');
-                        cleanup();
-                        return running = false;
-                    }
-                    if (now >= start_time) {
-                        const t = easing((now - start_time) / duration);
-                        tick(t, 1 - t);
-                    }
-                }
-                return running;
-            });
-        }
-        let started = false;
-        return {
-            start() {
-                if (started)
-                    return;
-                delete_rule(node);
-                if (is_function(config)) {
-                    config = config();
-                    wait().then(go);
-                }
-                else {
-                    go();
-                }
-            },
-            invalidate() {
-                started = false;
-            },
-            end() {
-                if (running) {
-                    cleanup();
-                    running = false;
-                }
-            }
-        };
+
+    function destroy_block(block, lookup) {
+        block.d(1);
+        lookup.delete(block.key);
     }
-    function create_out_transition(node, fn, params) {
-        let config = fn(node, params);
-        let running = true;
-        let animation_name;
-        const group = outros;
-        group.r += 1;
-        function go() {
-            const { delay = 0, duration = 300, easing = identity, tick = noop, css } = config || null_transition;
-            if (css)
-                animation_name = create_rule(node, 1, 0, duration, delay, easing, css);
-            const start_time = now() + delay;
-            const end_time = start_time + duration;
-            add_render_callback(() => dispatch(node, false, 'start'));
-            loop(now => {
-                if (running) {
-                    if (now >= end_time) {
-                        tick(0, 1);
-                        dispatch(node, false, 'end');
-                        if (!--group.r) {
-                            // this will result in `end()` being called,
-                            // so we don't need to clean up here
-                            run_all(group.c);
-                        }
-                        return false;
-                    }
-                    if (now >= start_time) {
-                        const t = easing((now - start_time) / duration);
-                        tick(1 - t, t);
-                    }
-                }
-                return running;
-            });
-        }
-        if (is_function(config)) {
-            wait().then(() => {
-                // @ts-ignore
-                config = config();
-                go();
-            });
-        }
-        else {
-            go();
-        }
-        return {
-            end(reset) {
-                if (reset && config.tick) {
-                    config.tick(1, 0);
-                }
-                if (running) {
-                    if (animation_name)
-                        delete_rule(node, animation_name);
-                    running = false;
-                }
-            }
-        };
-    }
-    function outro_and_destroy_block(block, lookup) {
-        transition_out(block, 1, 1, () => {
-            lookup.delete(block.key);
-        });
-    }
-    function fix_and_outro_and_destroy_block(block, lookup) {
+    function fix_and_destroy_block(block, lookup) {
         block.f();
-        outro_and_destroy_block(block, lookup);
+        destroy_block(block, lookup);
     }
     function update_keyed_each(old_blocks, dirty, get_key, dynamic, ctx, list, lookup, node, destroy, create_each_block, next, get_context) {
         let o = old_blocks.length;
@@ -3819,9 +3673,6 @@ var sveltesortabledocs = (function () {
     }
 
     function ID() {
-      // Math.random should be unique because of its seeding algorithm.
-      // Convert it to base 36 (numbers + letters), and grab the first 9 characters
-      // after the decimal.
       return (
         "clone" +
         Math.random()
@@ -3846,7 +3697,7 @@ var sveltesortabledocs = (function () {
     			if (default_slot) default_slot.c();
     			attr_dev(div, "id", /*id*/ ctx[0]);
     			attr_dev(div, "class", "svelte-sortable");
-    			add_location(div, file, 104, 0, 2924);
+    			add_location(div, file, 112, 0, 3245);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3903,17 +3754,23 @@ var sveltesortabledocs = (function () {
     	let { id = undefined } = $$props;
     	let { list = [] } = $$props;
     	let { clone = (item, evt) => ({ ...item, id: ID() }) } = $$props;
-    	let { options = { animation: 0 } } = $$props;
+    	let { options = {} } = $$props;
     	let el, sortable;
 
     	onMount(() => {
     		sortable = Sortable.create(el, {
-    			...options,
+    			...{
+    				...options,
+    				animation: 0,
+    				dataIdAttr: "sortable-id"
+    			},
     			onStart(evt) {
     				dragginglist = list;
+    				options.onStart && options.onStart(evt);
     			},
     			onEnd(evt) {
     				dragginglist = null;
+    				options.onEnd && options.onEnd(evt);
     			},
     			onAdd(evt) {
     				const otherList = [...dragginglist];
@@ -3921,6 +3778,7 @@ var sveltesortabledocs = (function () {
     				removeNodes(customs);
     				const newList = handleStateAdd(customs, list);
     				$$invalidate(2, list = newList);
+    				options.onAdd && options.onAdd(evt);
     			},
     			onRemove(evt) {
     				const mode = getMode(evt);
@@ -3956,6 +3814,7 @@ var sveltesortabledocs = (function () {
 
     				newList = newList.map(item => ({ ...item, selected: false }));
     				$$invalidate(2, list = newList);
+    				options.onRemove && options.onRemove(evt);
     			},
     			onUpdate(evt) {
     				const customs = createCustoms(evt, list);
@@ -3963,8 +3822,11 @@ var sveltesortabledocs = (function () {
     				insertNodes(customs);
     				const newList = handleStateChanges(customs, list);
     				$$invalidate(2, list = newList);
+    				options.onUpdate && options.onUpdate(evt);
     			}
     		});
+
+    		$$invalidate(1, el.sortable = sortable, el);
     	});
 
     	const writable_props = ["id", "list", "clone", "options"];
@@ -4063,9 +3925,6 @@ var sveltesortabledocs = (function () {
         const f = t - 1.0;
         return f * f * f + 1.0;
     }
-    function quintOut(t) {
-        return --t * t * t * t * t + 1;
-    }
 
     function flip(node, animation, params) {
         const style = getComputedStyle(node);
@@ -4082,83 +3941,6 @@ var sveltesortabledocs = (function () {
             easing,
             css: (_t, u) => `transform: ${transform} translate(${u * dx}px, ${u * dy}px);`
         };
-    }
-
-    /*! *****************************************************************************
-    Copyright (c) Microsoft Corporation. All rights reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-    this file except in compliance with the License. You may obtain a copy of the
-    License at http://www.apache.org/licenses/LICENSE-2.0
-
-    THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-    WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-    MERCHANTABLITY OR NON-INFRINGEMENT.
-
-    See the Apache Version 2.0 License for specific language governing permissions
-    and limitations under the License.
-    ***************************************************************************** */
-
-    function __rest(s, e) {
-        var t = {};
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-            t[p] = s[p];
-        if (s != null && typeof Object.getOwnPropertySymbols === "function")
-            for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-                if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                    t[p[i]] = s[p[i]];
-            }
-        return t;
-    }
-    function crossfade(_a) {
-        var { fallback } = _a, defaults = __rest(_a, ["fallback"]);
-        const to_receive = new Map();
-        const to_send = new Map();
-        function crossfade(from, node, params) {
-            const { delay = 0, duration = d => Math.sqrt(d) * 30, easing = cubicOut } = assign(assign({}, defaults), params);
-            const to = node.getBoundingClientRect();
-            const dx = from.left - to.left;
-            const dy = from.top - to.top;
-            const dw = from.width / to.width;
-            const dh = from.height / to.height;
-            const d = Math.sqrt(dx * dx + dy * dy);
-            const style = getComputedStyle(node);
-            const transform = style.transform === 'none' ? '' : style.transform;
-            const opacity = +style.opacity;
-            return {
-                delay,
-                duration: is_function(duration) ? duration(d) : duration,
-                easing,
-                css: (t, u) => `
-				opacity: ${t * opacity};
-				transform-origin: top left;
-				transform: ${transform} translate(${u * dx}px,${u * dy}px) scale(${t + (1 - t) * dw}, ${t + (1 - t) * dh});
-			`
-            };
-        }
-        function transition(items, counterparts, intro) {
-            return (node, params) => {
-                items.set(params.key, {
-                    rect: node.getBoundingClientRect()
-                });
-                return () => {
-                    if (counterparts.has(params.key)) {
-                        const { rect } = counterparts.get(params.key);
-                        counterparts.delete(params.key);
-                        return crossfade(rect, node, params);
-                    }
-                    // if the node is disappearing altogether
-                    // (i.e. wasn't claimed by the other list)
-                    // then we need to supply an outro
-                    items.delete(params.key);
-                    return fallback && fallback(node, params, intro);
-                };
-            };
-        }
-        return [
-            transition(to_send, to_receive, false),
-            transition(to_receive, to_send, true)
-        ];
     }
 
     /* src\logo.svelte generated by Svelte v3.16.7 */
@@ -4252,32 +4034,29 @@ var sveltesortabledocs = (function () {
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[12] = list[i];
+    	child_ctx[9] = list[i];
     	return child_ctx;
     }
 
     function get_each_context_1(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[12] = list[i];
+    	child_ctx[9] = list[i];
     	return child_ctx;
     }
 
-    // (184:8) {#each list as todo (todo.id)}
+    // (165:8) {#each list as todo (todo.id)}
     function create_each_block_1(key_1, ctx) {
     	let li;
-    	let t0_value = /*todo*/ ctx[12].name + "";
+    	let t0_value = /*todo*/ ctx[9].name + "";
     	let t0;
     	let t1;
     	let button;
     	let t2;
     	let button_data_id_value;
     	let t3;
-    	let li_data_id_value;
-    	let li_intro;
-    	let li_outro;
+    	let li_sortable_id_value;
     	let rect;
     	let stop_animation = noop;
-    	let current;
     	let dispose;
 
     	const block = {
@@ -4290,13 +4069,13 @@ var sveltesortabledocs = (function () {
     			button = element("button");
     			t2 = text("Delete");
     			t3 = space();
-    			attr_dev(button, "class", "delete-button svelte-1ahphx6");
-    			attr_dev(button, "data-id", button_data_id_value = /*todo*/ ctx[12].id);
-    			add_location(button, file$2, 191, 12, 4226);
-    			attr_dev(li, "data-id", li_data_id_value = /*todo*/ ctx[12].id);
-    			attr_dev(li, "class", "todo svelte-1ahphx6");
-    			add_location(li, file$2, 184, 10, 3996);
-    			dispose = listen_dev(button, "click", /*deleteTodo*/ ctx[8], false, false, false);
+    			attr_dev(button, "class", "delete-button svelte-ab09md");
+    			attr_dev(button, "data-id", button_data_id_value = /*todo*/ ctx[9].id);
+    			add_location(button, file$2, 170, 12, 3628);
+    			attr_dev(li, "sortable-id", li_sortable_id_value = /*todo*/ ctx[9].id);
+    			attr_dev(li, "class", "todo svelte-ab09md");
+    			add_location(li, file$2, 165, 10, 3478);
+    			dispose = listen_dev(button, "click", /*deleteTodo*/ ctx[5], false, false, false);
     			this.first = li;
     		},
     		m: function mount(target, anchor) {
@@ -4306,17 +4085,16 @@ var sveltesortabledocs = (function () {
     			append_dev(li, button);
     			append_dev(button, t2);
     			append_dev(li, t3);
-    			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if ((!current || dirty & /*list*/ 2) && t0_value !== (t0_value = /*todo*/ ctx[12].name + "")) set_data_dev(t0, t0_value);
+    			if (dirty & /*list*/ 2 && t0_value !== (t0_value = /*todo*/ ctx[9].name + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*list*/ 2 && button_data_id_value !== (button_data_id_value = /*todo*/ ctx[12].id)) {
+    			if (dirty & /*list*/ 2 && button_data_id_value !== (button_data_id_value = /*todo*/ ctx[9].id)) {
     				attr_dev(button, "data-id", button_data_id_value);
     			}
 
-    			if (!current || dirty & /*list*/ 2 && li_data_id_value !== (li_data_id_value = /*todo*/ ctx[12].id)) {
-    				attr_dev(li, "data-id", li_data_id_value);
+    			if (dirty & /*list*/ 2 && li_sortable_id_value !== (li_sortable_id_value = /*todo*/ ctx[9].id)) {
+    				attr_dev(li, "sortable-id", li_sortable_id_value);
     			}
     		},
     		r: function measure() {
@@ -4325,31 +4103,13 @@ var sveltesortabledocs = (function () {
     		f: function fix() {
     			fix_position(li);
     			stop_animation();
-    			add_transform(li, rect);
     		},
     		a: function animate() {
     			stop_animation();
     			stop_animation = create_animation(li, rect, flip, { duration: 250 });
     		},
-    		i: function intro(local) {
-    			if (current) return;
-
-    			add_render_callback(() => {
-    				if (li_outro) li_outro.end(1);
-    				if (!li_intro) li_intro = create_in_transition(li, /*receive*/ ctx[4], { key: /*todo*/ ctx[12].id });
-    				li_intro.start();
-    			});
-
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			if (li_intro) li_intro.invalidate();
-    			li_outro = create_out_transition(li, /*send*/ ctx[3], { key: /*todo*/ ctx[12].id });
-    			current = false;
-    		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(li);
-    			if (detaching && li_outro) li_outro.end();
     			dispose();
     		}
     	};
@@ -4358,21 +4118,20 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_each_block_1.name,
     		type: "each",
-    		source: "(184:8) {#each list as todo (todo.id)}",
+    		source: "(165:8) {#each list as todo (todo.id)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (183:6) <Sortable {options} bind:list>
+    // (164:6) <Sortable {options} bind:list>
     function create_default_slot_1(ctx) {
     	let each_blocks = [];
     	let each_1_lookup = new Map();
     	let each_1_anchor;
-    	let current;
     	let each_value_1 = /*list*/ ctx[1];
-    	const get_key = ctx => /*todo*/ ctx[12].id;
+    	const get_key = ctx => /*todo*/ ctx[9].id;
 
     	for (let i = 0; i < each_value_1.length; i += 1) {
     		let child_ctx = get_each_context_1(ctx, each_value_1, i);
@@ -4394,31 +4153,12 @@ var sveltesortabledocs = (function () {
     			}
 
     			insert_dev(target, each_1_anchor, anchor);
-    			current = true;
     		},
     		p: function update(ctx, dirty) {
     			const each_value_1 = /*list*/ ctx[1];
-    			group_outros();
     			for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
-    			each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value_1, each_1_lookup, each_1_anchor.parentNode, fix_and_outro_and_destroy_block, create_each_block_1, each_1_anchor, get_each_context_1);
+    			each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value_1, each_1_lookup, each_1_anchor.parentNode, fix_and_destroy_block, create_each_block_1, each_1_anchor, get_each_context_1);
     			for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].a();
-    			check_outros();
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-
-    			for (let i = 0; i < each_value_1.length; i += 1) {
-    				transition_in(each_blocks[i]);
-    			}
-
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				transition_out(each_blocks[i]);
-    			}
-
-    			current = false;
     		},
     		d: function destroy(detaching) {
     			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -4433,25 +4173,22 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(183:6) <Sortable {options} bind:list>",
+    		source: "(164:6) <Sortable {options} bind:list>",
     		ctx
     	});
 
     	return block;
     }
 
-    // (205:8) {#each list2 as todo (todo.id)}
+    // (184:8) {#each list2 as todo (todo.id)}
     function create_each_block(key_1, ctx) {
     	let li;
-    	let t0_value = /*todo*/ ctx[12].name + "";
+    	let t0_value = /*todo*/ ctx[9].name + "";
     	let t0;
     	let t1;
-    	let li_data_id_value;
-    	let li_intro;
-    	let li_outro;
+    	let li_sortable_id_value;
     	let rect;
     	let stop_animation = noop;
-    	let current;
 
     	const block = {
     		key: key_1,
@@ -4460,22 +4197,21 @@ var sveltesortabledocs = (function () {
     			li = element("li");
     			t0 = text(t0_value);
     			t1 = space();
-    			attr_dev(li, "data-id", li_data_id_value = /*todo*/ ctx[12].id);
-    			attr_dev(li, "class", "todo svelte-1ahphx6");
-    			add_location(li, file$2, 205, 10, 4622);
+    			attr_dev(li, "sortable-id", li_sortable_id_value = /*todo*/ ctx[9].id);
+    			attr_dev(li, "class", "todo svelte-ab09md");
+    			add_location(li, file$2, 184, 10, 4015);
     			this.first = li;
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
     			append_dev(li, t0);
     			append_dev(li, t1);
-    			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if ((!current || dirty & /*list2*/ 4) && t0_value !== (t0_value = /*todo*/ ctx[12].name + "")) set_data_dev(t0, t0_value);
+    			if (dirty & /*list2*/ 4 && t0_value !== (t0_value = /*todo*/ ctx[9].name + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*list2*/ 4 && li_data_id_value !== (li_data_id_value = /*todo*/ ctx[12].id)) {
-    				attr_dev(li, "data-id", li_data_id_value);
+    			if (dirty & /*list2*/ 4 && li_sortable_id_value !== (li_sortable_id_value = /*todo*/ ctx[9].id)) {
+    				attr_dev(li, "sortable-id", li_sortable_id_value);
     			}
     		},
     		r: function measure() {
@@ -4484,31 +4220,13 @@ var sveltesortabledocs = (function () {
     		f: function fix() {
     			fix_position(li);
     			stop_animation();
-    			add_transform(li, rect);
     		},
     		a: function animate() {
     			stop_animation();
     			stop_animation = create_animation(li, rect, flip, { duration: 250 });
     		},
-    		i: function intro(local) {
-    			if (current) return;
-
-    			add_render_callback(() => {
-    				if (li_outro) li_outro.end(1);
-    				if (!li_intro) li_intro = create_in_transition(li, /*receive*/ ctx[4], { key: /*todo*/ ctx[12].id });
-    				li_intro.start();
-    			});
-
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			if (li_intro) li_intro.invalidate();
-    			li_outro = create_out_transition(li, /*send*/ ctx[3], { key: /*todo*/ ctx[12].id });
-    			current = false;
-    		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(li);
-    			if (detaching && li_outro) li_outro.end();
     		}
     	};
 
@@ -4516,21 +4234,20 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(205:8) {#each list2 as todo (todo.id)}",
+    		source: "(184:8) {#each list2 as todo (todo.id)}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (204:6) <Sortable options={options2} bind:list={list2}>
+    // (183:6) <Sortable {options} bind:list={list2}>
     function create_default_slot(ctx) {
     	let each_blocks = [];
     	let each_1_lookup = new Map();
     	let each_1_anchor;
-    	let current;
     	let each_value = /*list2*/ ctx[2];
-    	const get_key = ctx => /*todo*/ ctx[12].id;
+    	const get_key = ctx => /*todo*/ ctx[9].id;
 
     	for (let i = 0; i < each_value.length; i += 1) {
     		let child_ctx = get_each_context(ctx, each_value, i);
@@ -4552,31 +4269,12 @@ var sveltesortabledocs = (function () {
     			}
 
     			insert_dev(target, each_1_anchor, anchor);
-    			current = true;
     		},
     		p: function update(ctx, dirty) {
     			const each_value = /*list2*/ ctx[2];
-    			group_outros();
     			for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
-    			each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, each_1_anchor.parentNode, fix_and_outro_and_destroy_block, create_each_block, each_1_anchor, get_each_context);
+    			each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, each_1_anchor.parentNode, fix_and_destroy_block, create_each_block, each_1_anchor, get_each_context);
     			for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].a();
-    			check_outros();
-    		},
-    		i: function intro(local) {
-    			if (current) return;
-
-    			for (let i = 0; i < each_value.length; i += 1) {
-    				transition_in(each_blocks[i]);
-    			}
-
-    			current = true;
-    		},
-    		o: function outro(local) {
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				transition_out(each_blocks[i]);
-    			}
-
-    			current = false;
     		},
     		d: function destroy(detaching) {
     			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -4591,7 +4289,7 @@ var sveltesortabledocs = (function () {
     		block,
     		id: create_default_slot.name,
     		type: "slot",
-    		source: "(204:6) <Sortable options={options2} bind:list={list2}>",
+    		source: "(183:6) <Sortable {options} bind:list={list2}>",
     		ctx
     	});
 
@@ -4632,11 +4330,11 @@ var sveltesortabledocs = (function () {
     	const logo = new Logo({ $$inline: true });
 
     	function sortable0_list_binding(value_1) {
-    		/*sortable0_list_binding*/ ctx[10].call(null, value_1);
+    		/*sortable0_list_binding*/ ctx[7].call(null, value_1);
     	}
 
     	let sortable0_props = {
-    		options: /*options*/ ctx[5],
+    		options: /*options*/ ctx[3],
     		$$slots: { default: [create_default_slot_1] },
     		$$scope: { ctx }
     	};
@@ -4649,11 +4347,11 @@ var sveltesortabledocs = (function () {
     	binding_callbacks.push(() => bind(sortable0, "list", sortable0_list_binding));
 
     	function sortable1_list_binding(value_2) {
-    		/*sortable1_list_binding*/ ctx[11].call(null, value_2);
+    		/*sortable1_list_binding*/ ctx[8].call(null, value_2);
     	}
 
     	let sortable1_props = {
-    		options: /*options2*/ ctx[6],
+    		options: /*options*/ ctx[3],
     		$$slots: { default: [create_default_slot] },
     		$$scope: { ctx }
     	};
@@ -4697,39 +4395,39 @@ var sveltesortabledocs = (function () {
     			t12 = text(t12_value);
     			attr_dev(input, "placeholder", "What to procrastinate");
     			attr_dev(input, "type", "text");
-    			attr_dev(input, "class", "svelte-1ahphx6");
-    			add_location(input, file$2, 173, 6, 3603);
+    			attr_dev(input, "class", "svelte-ab09md");
+    			add_location(input, file$2, 154, 6, 3085);
     			button.disabled = button_disabled_value = !/*value*/ ctx[0];
-    			attr_dev(button, "class", "svelte-1ahphx6");
-    			add_location(button, file$2, 174, 6, 3679);
+    			attr_dev(button, "class", "svelte-ab09md");
+    			add_location(button, file$2, 155, 6, 3161);
     			attr_dev(div0, "id", "input");
-    			attr_dev(div0, "class", "svelte-1ahphx6");
-    			add_location(div0, file$2, 172, 4, 3579);
-    			add_location(div1, file$2, 170, 2, 3566);
-    			attr_dev(div2, "class", "console svelte-1ahphx6");
-    			add_location(div2, file$2, 179, 4, 3784);
-    			attr_dev(h20, "class", "svelte-1ahphx6");
-    			add_location(h20, file$2, 181, 6, 3887);
-    			attr_dev(div3, "class", "card svelte-1ahphx6");
+    			attr_dev(div0, "class", "svelte-ab09md");
+    			add_location(div0, file$2, 153, 4, 3061);
+    			add_location(div1, file$2, 151, 2, 3048);
+    			attr_dev(div2, "class", "console svelte-ab09md");
+    			add_location(div2, file$2, 160, 4, 3266);
+    			attr_dev(h20, "class", "svelte-ab09md");
+    			add_location(h20, file$2, 162, 6, 3369);
+    			attr_dev(div3, "class", "card svelte-ab09md");
     			attr_dev(div3, "id", "incomplete");
-    			add_location(div3, file$2, 180, 4, 3845);
-    			attr_dev(h21, "class", "svelte-1ahphx6");
-    			add_location(h21, file$2, 202, 6, 4497);
-    			attr_dev(div4, "class", "card svelte-1ahphx6");
+    			add_location(div3, file$2, 161, 4, 3327);
+    			attr_dev(h21, "class", "svelte-ab09md");
+    			add_location(h21, file$2, 181, 6, 3899);
+    			attr_dev(div4, "class", "card svelte-ab09md");
     			attr_dev(div4, "id", "complete");
-    			add_location(div4, file$2, 201, 4, 4457);
-    			attr_dev(div5, "class", "console svelte-1ahphx6");
-    			add_location(div5, file$2, 216, 4, 4909);
+    			add_location(div4, file$2, 180, 4, 3859);
+    			attr_dev(div5, "class", "console svelte-ab09md");
+    			add_location(div5, file$2, 193, 4, 4222);
     			attr_dev(div6, "id", "todos");
-    			attr_dev(div6, "class", "svelte-1ahphx6");
-    			add_location(div6, file$2, 178, 2, 3762);
+    			attr_dev(div6, "class", "svelte-ab09md");
+    			add_location(div6, file$2, 159, 2, 3244);
     			attr_dev(div7, "id", "docs");
-    			attr_dev(div7, "class", "svelte-1ahphx6");
-    			add_location(div7, file$2, 168, 0, 3535);
+    			attr_dev(div7, "class", "svelte-ab09md");
+    			add_location(div7, file$2, 149, 0, 3017);
 
     			dispose = [
-    				listen_dev(input, "input", /*input_input_handler*/ ctx[9]),
-    				listen_dev(button, "click", /*addTodo*/ ctx[7], false, false, false)
+    				listen_dev(input, "input", /*input_input_handler*/ ctx[6]),
+    				listen_dev(button, "click", /*addTodo*/ ctx[4], false, false, false)
     			];
     		},
     		l: function claim(nodes) {
@@ -4777,7 +4475,7 @@ var sveltesortabledocs = (function () {
     			if ((!current || dirty & /*list*/ 2) && t4_value !== (t4_value = JSON.stringify(/*list*/ ctx[1], 0, 4) + "")) set_data_dev(t4, t4_value);
     			const sortable0_changes = {};
 
-    			if (dirty & /*$$scope, list*/ 131074) {
+    			if (dirty & /*$$scope, list*/ 16386) {
     				sortable0_changes.$$scope = { dirty, ctx };
     			}
 
@@ -4790,7 +4488,7 @@ var sveltesortabledocs = (function () {
     			sortable0.$set(sortable0_changes);
     			const sortable1_changes = {};
 
-    			if (dirty & /*$$scope, list2*/ 131076) {
+    			if (dirty & /*$$scope, list2*/ 16388) {
     				sortable1_changes.$$scope = { dirty, ctx };
     			}
 
@@ -4838,26 +4536,7 @@ var sveltesortabledocs = (function () {
 
     function instance$1($$self, $$props, $$invalidate) {
     	let value = "";
-
-    	const [send, receive] = crossfade({
-    		duration: d => Math.sqrt(d * 200),
-    		fallback(node, params) {
-    			const style = getComputedStyle(node);
-    			const transform = style.transform === "none" ? "" : style.transform;
-
-    			return {
-    				duration: 250,
-    				easing: quintOut,
-    				css: t => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`
-    			};
-    		}
-    	});
-
     	let options = { group: "people", draggable: ".todo" };
-    	let options2 = { group: "people", draggable: ".todo" };
     	let list = [{ id: "_dodishes", name: "Do the dishes" }];
     	let list2 = [];
 
@@ -4897,8 +4576,7 @@ var sveltesortabledocs = (function () {
 
     	$$self.$inject_state = $$props => {
     		if ("value" in $$props) $$invalidate(0, value = $$props.value);
-    		if ("options" in $$props) $$invalidate(5, options = $$props.options);
-    		if ("options2" in $$props) $$invalidate(6, options2 = $$props.options2);
+    		if ("options" in $$props) $$invalidate(3, options = $$props.options);
     		if ("list" in $$props) $$invalidate(1, list = $$props.list);
     		if ("list2" in $$props) $$invalidate(2, list2 = $$props.list2);
     	};
@@ -4907,10 +4585,7 @@ var sveltesortabledocs = (function () {
     		value,
     		list,
     		list2,
-    		send,
-    		receive,
     		options,
-    		options2,
     		addTodo,
     		deleteTodo,
     		input_input_handler,

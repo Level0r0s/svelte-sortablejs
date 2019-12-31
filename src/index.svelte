@@ -18,18 +18,23 @@
   export let id = undefined;
   export let list = [];
   export let clone = (item, evt) => ({ ...item, id: ID() });
-  export let options = { animation: 0 };
+  export let options = {};
   let el, sortable;
-
   onMount(() => {
     sortable = sortablejs.create(el, {
-      ...options,
+      ...{
+        ...options,
+        animation: 0,
+        dataIdAttr: "sortable-id"
+      },
       onStart(evt) {
         dragginglist = list;
+        options.onStart && options.onStart(evt);
       },
 
       onEnd(evt) {
         dragginglist = null;
+        options.onEnd && options.onEnd(evt);
       },
       onAdd(evt) {
         const otherList = [...dragginglist];
@@ -37,6 +42,7 @@
         removeNodes(customs);
         const newList = handleStateAdd(customs, list);
         list = newList;
+        options.onAdd && options.onAdd(evt);
       },
       onRemove(evt) {
         const mode = getMode(evt);
@@ -48,7 +54,6 @@
         if (evt.pullMode !== "clone")
           newList = handleStateRemove(customs, newList);
         // if clone, it doesn't really remove. instead it clones in place.
-        // @todo -
         else {
           // switch used to get the clone
           let customClones = customs;
@@ -86,6 +91,7 @@
         // remove item.selected from list
         newList = newList.map(item => ({ ...item, selected: false }));
         list = newList;
+        options.onRemove && options.onRemove(evt);
       },
       onUpdate(evt) {
         const customs = createCustoms(evt, list);
@@ -93,8 +99,10 @@
         insertNodes(customs);
         const newList = handleStateChanges(customs, list);
         list = newList;
+        options.onUpdate && options.onUpdate(evt);
       }
     });
+    el.sortable = sortable;
   });
 </script>
 

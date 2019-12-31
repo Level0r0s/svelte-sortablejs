@@ -1,6 +1,10 @@
 <script>
+  /*
+
+TODO: Refactor all of this
+
+*/
   import Sortable from "./index.svelte";
-  import { quintOut } from "svelte/easing";
   import { flip } from "svelte/animate";
   import { crossfade } from "svelte/transition";
 
@@ -8,29 +12,7 @@
 
   let value = "";
 
-  const [send, receive] = crossfade({
-    duration: d => Math.sqrt(d * 200),
-
-    fallback(node, params) {
-      const style = getComputedStyle(node);
-      const transform = style.transform === "none" ? "" : style.transform;
-
-      return {
-        duration: 250,
-        easing: quintOut,
-        css: t => `
-					transform: ${transform} scale(${t});
-					opacity: ${t}
-				`
-      };
-    }
-  });
-
   let options = {
-    group: "people",
-    draggable: ".todo"
-  };
-  let options2 = {
     group: "people",
     draggable: ".todo"
   };
@@ -81,7 +63,6 @@
     background: white;
     color: #d33906;
     font-size: 12px;
-    font-weight: 500px;
   }
   #input {
     display: flex;
@@ -183,10 +164,8 @@
       <Sortable {options} bind:list>
         {#each list as todo (todo.id)}
           <li
-            in:receive={{ key: todo.id }}
-            out:send={{ key: todo.id }}
             animate:flip={{ duration: 250 }}
-            data-id={todo.id}
+            sortable-id={todo.id}
             class="todo">
             {todo.name}
             <button
@@ -201,13 +180,11 @@
     </div>
     <div class="card" id="complete">
       <h2>Complete</h2>
-      <Sortable options={options2} bind:list={list2}>
+      <Sortable {options} bind:list={list2}>
         {#each list2 as todo (todo.id)}
           <li
-            in:receive={{ key: todo.id }}
-            out:send={{ key: todo.id }}
             animate:flip={{ duration: 250 }}
-            data-id={todo.id}
+            sortable-id={todo.id}
             class="todo">
             {todo.name}
           </li>
