@@ -1,5 +1,26 @@
 <script>
   import Sortable from "./index.svelte";
+  import { quintOut } from "svelte/easing";
+  import { flip } from "svelte/animate";
+  import { crossfade } from "svelte/transition";
+
+  const [send, receive] = crossfade({
+    duration: d => Math.sqrt(d * 200),
+
+    fallback(node, params) {
+      const style = getComputedStyle(node);
+      const transform = style.transform === "none" ? "" : style.transform;
+
+      return {
+        duration: 250,
+        easing: quintOut,
+        css: t => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`
+      };
+    }
+  });
 
   let options = {
     group: "people",
@@ -70,15 +91,27 @@
     {JSON.stringify(list, 0, 4)}
   </div>
   <Sortable id="sortable-a" {options} bind:list>
-    {#each list as item}
-      <li data-id={item.id} class="item" style="background:{item.color};">
+    {#each list as item (item.id)}
+      <li
+        in:receive={{ key: item.id }}
+        out:send={{ key: item.id }}
+        animate:flip={{ duration: 250 }}
+        data-id={item.id}
+        class="item"
+        style="background:{item.color};">
         {item.name}
       </li>
     {/each}
   </Sortable>
   <Sortable id="sortable-b" options={options2} bind:list={list2}>
-    {#each list2 as item}
-      <li data-id={item.id} class="item" style="background:{item.color};">
+    {#each list2 as item (item.id)}
+      <li
+        in:receive={{ key: item.id }}
+        out:send={{ key: item.id }}
+        animate:flip={{ duration: 250 }}
+        data-id={item.id}
+        class="item"
+        style="background:{item.color};">
         {item.name}
       </li>
     {/each}
