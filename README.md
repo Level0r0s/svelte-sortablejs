@@ -7,7 +7,6 @@
 yarn add svelte-sortablejs
 ```
 
-
 ```js
 <script>
 import Sortable from "svelte-sortablejs";
@@ -17,8 +16,6 @@ let options = {
   group: "people",
   draggable: ".todo"
 };
-
-
 </script>
 
 
