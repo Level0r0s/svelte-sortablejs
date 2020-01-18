@@ -16,6 +16,7 @@
     handleStateChanges
   } from "./utils";
   export let id = undefined;
+  export let classname = "";
   export let list = [];
   export let clone = (item, evt) => ({ ...item, id: ID() });
   export let options = {};
@@ -112,6 +113,6 @@
 
 </style>
 
-<div {id} class="svelte-sortable" bind:this={el}>
+<div {id} class="svelte-sortable {classname}" bind:this={el}>
   <slot />
 </div>

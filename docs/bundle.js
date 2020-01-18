@@ -3795,17 +3795,18 @@ var sveltesortabledocs = (function () {
 
     function create_fragment$1(ctx) {
     	let div;
+    	let div_class_value;
     	let current;
-    	const default_slot_template = /*$$slots*/ ctx[8].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[7], null);
+    	const default_slot_template = /*$$slots*/ ctx[9].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[8], null);
 
     	const block = {
     		c: function create() {
     			div = element("div");
     			if (default_slot) default_slot.c();
     			attr_dev(div, "id", /*id*/ ctx[0]);
-    			attr_dev(div, "class", "svelte-sortable");
-    			add_location(div, file$1, 114, 0, 3278);
+    			attr_dev(div, "class", div_class_value = "svelte-sortable " + /*classname*/ ctx[1]);
+    			add_location(div, file$1, 115, 0, 3308);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3817,16 +3818,20 @@ var sveltesortabledocs = (function () {
     				default_slot.m(div, null);
     			}
 
-    			/*div_binding*/ ctx[9](div);
+    			/*div_binding*/ ctx[10](div);
     			current = true;
     		},
     		p: function update(ctx, [dirty]) {
-    			if (default_slot && default_slot.p && dirty & /*$$scope*/ 128) {
-    				default_slot.p(get_slot_context(default_slot_template, ctx, /*$$scope*/ ctx[7], null), get_slot_changes(default_slot_template, /*$$scope*/ ctx[7], dirty, null));
+    			if (default_slot && default_slot.p && dirty & /*$$scope*/ 256) {
+    				default_slot.p(get_slot_context(default_slot_template, ctx, /*$$scope*/ ctx[8], null), get_slot_changes(default_slot_template, /*$$scope*/ ctx[8], dirty, null));
     			}
 
     			if (!current || dirty & /*id*/ 1) {
     				attr_dev(div, "id", /*id*/ ctx[0]);
+    			}
+
+    			if (!current || dirty & /*classname*/ 2 && div_class_value !== (div_class_value = "svelte-sortable " + /*classname*/ ctx[1])) {
+    				attr_dev(div, "class", div_class_value);
     			}
     		},
     		i: function intro(local) {
@@ -3841,7 +3846,7 @@ var sveltesortabledocs = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div);
     			if (default_slot) default_slot.d(detaching);
-    			/*div_binding*/ ctx[9](null);
+    			/*div_binding*/ ctx[10](null);
     		}
     	};
 
@@ -3860,6 +3865,7 @@ var sveltesortabledocs = (function () {
 
     function instance($$self, $$props, $$invalidate) {
     	let { id = undefined } = $$props;
+    	let { classname = "" } = $$props;
     	let { list = [] } = $$props;
     	let { clone = (item, evt) => ({ ...item, id: ID() }) } = $$props;
     	let { options = {} } = $$props;
@@ -3889,7 +3895,7 @@ var sveltesortabledocs = (function () {
     				const customs = createCustoms(evt, otherList);
     				removeNodes(customs);
     				const newList = handleStateAdd(customs, list);
-    				$$invalidate(2, list = newList);
+    				$$invalidate(3, list = newList);
     				options.onAdd && options.onAdd(evt);
     			},
     			onRemove(evt) {
@@ -3925,7 +3931,7 @@ var sveltesortabledocs = (function () {
     				}
 
     				newList = newList.map(item => ({ ...item, selected: false }));
-    				$$invalidate(2, list = newList);
+    				$$invalidate(3, list = newList);
     				options.onRemove && options.onRemove(evt);
     			},
     			onUpdate(evt) {
@@ -3933,13 +3939,13 @@ var sveltesortabledocs = (function () {
     				removeNodes(customs);
     				insertNodes(customs);
     				const newList = handleStateChanges(customs, list);
-    				$$invalidate(2, list = newList);
+    				$$invalidate(3, list = newList);
     				options.onUpdate && options.onUpdate(evt);
     			}
     		});
     	});
 
-    	const writable_props = ["id", "list", "clone", "options"];
+    	const writable_props = ["id", "classname", "list", "clone", "options"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Src> was created with unknown prop '${key}'`);
@@ -3949,22 +3955,24 @@ var sveltesortabledocs = (function () {
 
     	function div_binding($$value) {
     		binding_callbacks[$$value ? "unshift" : "push"](() => {
-    			$$invalidate(1, el = $$value);
+    			$$invalidate(2, el = $$value);
     		});
     	}
 
     	$$self.$set = $$props => {
     		if ("id" in $$props) $$invalidate(0, id = $$props.id);
-    		if ("list" in $$props) $$invalidate(2, list = $$props.list);
-    		if ("clone" in $$props) $$invalidate(3, clone = $$props.clone);
-    		if ("options" in $$props) $$invalidate(4, options = $$props.options);
-    		if ("$$scope" in $$props) $$invalidate(7, $$scope = $$props.$$scope);
+    		if ("classname" in $$props) $$invalidate(1, classname = $$props.classname);
+    		if ("list" in $$props) $$invalidate(3, list = $$props.list);
+    		if ("clone" in $$props) $$invalidate(4, clone = $$props.clone);
+    		if ("options" in $$props) $$invalidate(5, options = $$props.options);
+    		if ("$$scope" in $$props) $$invalidate(8, $$scope = $$props.$$scope);
     	};
 
     	$$self.$capture_state = () => {
     		return {
     			dragginglist,
     			id,
+    			classname,
     			list,
     			clone,
     			options,
@@ -3975,15 +3983,17 @@ var sveltesortabledocs = (function () {
 
     	$$self.$inject_state = $$props => {
     		if ("id" in $$props) $$invalidate(0, id = $$props.id);
-    		if ("list" in $$props) $$invalidate(2, list = $$props.list);
-    		if ("clone" in $$props) $$invalidate(3, clone = $$props.clone);
-    		if ("options" in $$props) $$invalidate(4, options = $$props.options);
-    		if ("el" in $$props) $$invalidate(1, el = $$props.el);
+    		if ("classname" in $$props) $$invalidate(1, classname = $$props.classname);
+    		if ("list" in $$props) $$invalidate(3, list = $$props.list);
+    		if ("clone" in $$props) $$invalidate(4, clone = $$props.clone);
+    		if ("options" in $$props) $$invalidate(5, options = $$props.options);
+    		if ("el" in $$props) $$invalidate(2, el = $$props.el);
     		if ("sortable" in $$props) sortable = $$props.sortable;
     	};
 
     	return [
     		id,
+    		classname,
     		el,
     		list,
     		clone,
@@ -4002,10 +4012,11 @@ var sveltesortabledocs = (function () {
 
     		init(this, options, instance, create_fragment$1, safe_not_equal, {
     			id: 0,
-    			list: 2,
-    			clone: 3,
-    			options: 4,
-    			getSortable: 5
+    			classname: 1,
+    			list: 3,
+    			clone: 4,
+    			options: 5,
+    			getSortable: 6
     		});
 
     		dispatch_dev("SvelteRegisterComponent", {
@@ -4021,6 +4032,14 @@ var sveltesortabledocs = (function () {
     	}
 
     	set id(value) {
+    		throw new Error("<Src>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get classname() {
+    		throw new Error("<Src>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set classname(value) {
     		throw new Error("<Src>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
@@ -4049,7 +4068,7 @@ var sveltesortabledocs = (function () {
     	}
 
     	get getSortable() {
-    		return this.$$.ctx[5];
+    		return this.$$.ctx[6];
     	}
 
     	set getSortable(value) {
