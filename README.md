@@ -9,6 +9,7 @@ yarn add svelte-sortablejs
 
 ```js
 <script>
+import { flip } from "svelte/animate";
 import Sortable from "svelte-sortablejs";
 
 let list = [{ id: "_dodishes", name: "Do the dishes" }];
